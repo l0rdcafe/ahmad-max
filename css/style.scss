@@ -1,0 +1,68 @@
+@import 'cc-ss_colors';
+
+/* Base Styles */
+
+body {
+  height: 97vh;
+  background: lighten($gray, 20%);
+
+  td {
+    padding: 0;
+    border: 0;
+  }
+}
+
+/* Layout Styles */
+
+.l-container {
+  background: lighten($gray, 20%);
+  width: 65.125%;
+  border: 1px solid $gray;
+  padding: 1%;
+}
+
+/* Module Styles */
+
+.background {
+  background: lighten($gray, 20%);
+  table-layout: fixed;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.game {
+  overflow: hidden;
+  max-width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.tire {
+  background: $gray;
+  border-radius: 50%;
+}
+
+.baltagy {
+  background: $red;
+  border-radius: 15%;
+}
+
+.actor {
+  position: absolute;
+}
+
+.ahmad {
+  position: absolute;
+  background: $maroon;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+.lost .ahmad {
+  background: darken($orange, 10%);
+}
+
+.won .ahmad {
+  -webkit-box-shadow: -4px -7px 8px $silver, 4px -7px 8px $silver;
+  box-shadow: -4px -7px 8px $silver, 4px -7px 8px $silver;
+}
