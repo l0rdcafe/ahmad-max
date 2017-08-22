@@ -90,6 +90,9 @@ model.Ahmad.prototype.moveX = function (step, level, keys) {
     level.playerTouched(obstacle);
   } else {
     this.pos = newPos;
+    if (newPos.x === level.width) {
+      this.speed.x = 0;
+    }
   }
 };
 
@@ -120,8 +123,6 @@ model.Baltagy.prototype.act = function (step, level) {
   var newPos = this.pos.plus(this.speed.times(step));
   if (!level.obstacleAt(newPos, this.size)) {
     this.pos = newPos;
-  } else {
-    this.speed = this.speed.times(-1);
   }
 };
 
@@ -179,6 +180,8 @@ model.Level.prototype.obstacleAt = function (pos, size) {
 
   if (yEnd > this.height) {
     return 'baltagy';
+  } else if (xEnd > this.width || xStart < 0) {
+    return 'bas';
   }
   for (y = yStart; y < yEnd; y += 1) {
     for (x = xStart; x < xEnd; x += 1) {
@@ -195,7 +198,13 @@ model.Level.prototype.actorAt = function (actor) {
   var other;
   for (i = 0; i < this.actors.length; i += 1) {
     other = this.actors[i];
-    if (other !== actor && actor.pos.x + actor.size.x > other.pos.x && actor.pos.x < other.pos.x + other.size.x && actor.pos.y + actor.size.y > other.pos.y && actor.pos.y < other.pos.y + other.size.y) {
+    if (
+      other !== actor &&
+      actor.pos.x + actor.size.x > other.pos.x &&
+      actor.pos.x < other.pos.x + other.size.x &&
+      actor.pos.y + actor.size.y > other.pos.y &&
+      actor.pos.y < other.pos.y + other.size.y
+    ) {
       return other;
     }
   }
@@ -253,7 +262,7 @@ view.DOMView = function (parent, level) {
 
 view.DOMView.prototype.drawBackground = function () {
   var background = helpers.element('table', 'background');
-  background.style.width = (this.level.width * scale) + 'px';
+  background.style.width = this.level.width * scale + 'px';
   this.level.grid.forEach(function (row) {
     var rowEl = background.appendChild(helpers.element('tr'));
     rowEl.style.height = scale + 'px';
@@ -268,10 +277,10 @@ view.DOMView.prototype.drawActors = function () {
   var wrap = helpers.element('div');
   this.level.actors.forEach(function (actor) {
     var rect = wrap.appendChild(helpers.element('div', 'actor ' + actor.type));
-    rect.style.width = (actor.size.x * scale) + 'px';
-    rect.style.height = (actor.size.y * scale) + 'px';
-    rect.style.left = (actor.pos.x * scale) + 'px';
-    rect.style.top = (actor.pos.y * scale) + 'px';
+    rect.style.width = actor.size.x * scale + 'px';
+    rect.style.height = actor.size.y * scale + 'px';
+    rect.style.left = actor.pos.x * scale + 'px';
+    rect.style.top = actor.pos.y * scale + 'px';
   });
   return wrap;
 };
@@ -282,29 +291,6 @@ view.DOMView.prototype.drawFrame = function () {
   }
   this.actorLayer = this.wrapper.appendChild(this.drawActors());
   this.wrapper.className = 'game ' + (this.level.status || '');
-  this.scrollPlayerIntoView();
-};
-
-view.DOMView.prototype.scrollPlayerIntoView = function () {
-  var width = this.wrapper.clientWidth;
-  var height = this.wrapper.clientHeight;
-  var margin = width / 3;
-  var left = this.wrapper.scrollLeft;
-  var right = left + width;
-  var top = this.wrapper.scrollTop;
-  var bottom = top + height;
-  var ahmad = this.level.player;
-  var center = ahmad.pos.plus(ahmad.size.times(0.5)).times(scale);
-  if (center.x < left + margin) {
-    this.wrapper.scrollLeft = center.x - margin;
-  } else if (center.x > right - margin) {
-    this.wrapper.scrollLeft = center.x + (margin - width);
-  }
-  if (center.y < top + margin) {
-    this.wrapper.scrollTop = center.y - margin;
-  } else if (center.y > bottom - margin) {
-    this.wrapper.scrollTop = center.y + (margin - height);
-  }
 };
 
 view.DOMView.prototype.clear = function () {
@@ -329,7 +315,6 @@ view.runAnimation = function (frameFunc) {
   requestAnimationFrame(frame);
 };
 
-
 handlers.trackKeys = function (codes) {
   var pressed = Object.create(null);
 
@@ -350,7 +335,7 @@ arrows = handlers.trackKeys(arrowCodes);
 model.runLevel(new model.Level(da2ery), view.DOMView, function (status) {
   if (status === 'lost') {
     model.runLevel(new model.Level(da2ery), view.DOMView, function () {
-      console.log('Game Over!');
+      document.querySelector('.container').textContent = 'Game Over';
     });
   }
 });
