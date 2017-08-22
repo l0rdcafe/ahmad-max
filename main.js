@@ -1,31 +1,31 @@
 var da2ery = [
-  '      xxxxx           ',
   '                      ',
-  '       e           xxx',
   '                      ',
-  'xxxxx                 ',
+  '       e              ',
+  '                      ',
+  '                      ',
   '                      ',
   '                  e   ',
-  '  xxxxx               ',
-  '           e        xx',
+  '                      ',
+  '           e          ',
   '                      ',
   '                      ',
-  '       xxxxx    xxxx  ',
-  '    xxxxxx       xxxxx',
+  '                      ',
+  '                      ',
   '                   e  ',
   '                      ',
   '        e             ',
-  '  xxxxx               ',
   '                      ',
   '                      ',
-  '            xxxxx     ',
+  '                      ',
+  '                      ',
   '     e                ',
   '                      ',
-  'xxx            xx     ',
   '                      ',
-  '              xxx     ',
   '                      ',
-  '  xxx                 ',
+  '                      ',
+  '                      ',
+  '                      ',
   '                      ',
   '                      ',
   '          a           '
@@ -38,9 +38,6 @@ var helpers = {};
 var scale = 36.125;
 var playerXSpeed = 7;
 var maxStep = 0.1;
-var wobbleSpeed = 10;
-var wobbleDist = 0.1;
-var playerYSpeed = 10;
 var arrowCodes = {
   37: 'left',
   38: 'up',
@@ -113,24 +110,6 @@ model.Ahmad.prototype.act = function (step, level, keys) {
 
 model.Ahmad.prototype.type = 'ahmad';
 
-model.Tire = function (pos) {
-  this.pos = pos.plus(new model.Vector(0.2, 0.1));
-  this.basePos = this.pos;
-  this.size = new model.Vector(1, 1);
-  this.speed = new model.Vector(0, 3);
-  this.wobble = Math.random() * (Math.PI * 2);
-};
-
-model.Tire.prototype.act = function (step) {
-  var wobblePos;
-  this.wobble += (step * wobbleSpeed) / 2;
-  wobblePos = Math.sin(this.wobble) * wobbleDist;
-  this.pos = this.basePos.plus(new model.Vector(0, wobblePos));
-  this.speed = new model.Vector(0, 3);
-};
-
-model.Tire.prototype.type = 'tire';
-
 model.Baltagy = function (pos) {
   this.pos = pos;
   this.size = new model.Vector(1, 1);
@@ -150,7 +129,6 @@ model.Baltagy.prototype.type = 'baltagy';
 
 model.actorChars = {
   a: model.Ahmad,
-  x: model.Tire,
   e: model.Baltagy
 };
 
@@ -176,8 +154,6 @@ model.Level = function (plan) {
       Actor = model.actorChars[ch];
       if (Actor) {
         this.actors.push(new Actor(new model.Vector(x, y), ch));
-      } else if (ch === 'x') {
-        field = 'tire';
       } else if (ch === 'e') {
         field = 'baltagy';
       }
@@ -201,9 +177,6 @@ model.Level.prototype.obstacleAt = function (pos, size) {
   var y;
   var field;
 
-  if (xStart < 0 || xEnd > this.width || yStart < 0) {
-    return 'tire';
-  }
   if (yEnd > this.height) {
     return 'baltagy';
   }
@@ -244,7 +217,7 @@ model.Level.prototype.animate = function (step, keys) {
 };
 
 model.Level.prototype.playerTouched = function (type) {
-  if ((type === 'baltagy' || type === 'tire') && this.status === null) {
+  if (type === 'baltagy' && this.status === null) {
     this.status = 'lost';
     this.finishDelay = 1;
   }
