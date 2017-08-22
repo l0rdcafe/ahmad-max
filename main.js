@@ -41,16 +41,10 @@ var maxStep = 0.1;
 var wobbleSpeed = 10;
 var wobbleDist = 0.1;
 var playerYSpeed = 10;
-var gravity = 30;
 var arrowCodes = {
   37: 'left',
   38: 'up',
   39: 'right'
-};
-var actorChars = {
-  a: model.Ahmad,
-  x: model.Tire,
-  e: model.Baltagy
 };
 var arrows;
 
@@ -78,7 +72,7 @@ model.Vector.prototype.times = function (factor) {
 model.Ahmad = function (pos) {
   this.pos = pos.plus(new model.Vector(0, -0.5));
   this.size = new model.Vector(0.8, 1.5);
-  this.speed = new model.Vector(0, -10);
+  this.speed = new model.Vector(0, 5);
 };
 
 model.Ahmad.prototype.moveX = function (step, level, keys) {
@@ -102,27 +96,9 @@ model.Ahmad.prototype.moveX = function (step, level, keys) {
   }
 };
 
-model.Ahmad.prototype.moveY = function (step, level) {
-  var motion;
-  var newPos;
-  var obstacle;
-  this.speed.y += step * gravity;
-  motion = new model.Vector(0, this.speed.y * step);
-  newPos = this.pos.plus(motion);
-  obstacle = level.obstacleAt(newPos, this.size);
-  if (obstacle) {
-    level.playerTouched(obstacle);
-    this.speed.y = 0;
-  } else {
-    this.speed.y = playerYSpeed;
-    this.pos = newPos;
-  }
-};
-
 model.Ahmad.prototype.act = function (step, level, keys) {
   var otherActor;
   this.moveX(step, level, keys);
-  this.moveY(step, level);
 
   otherActor = level.actorAt(this);
   if (otherActor) {
@@ -141,23 +117,24 @@ model.Tire = function (pos) {
   this.pos = pos.plus(new model.Vector(0.2, 0.1));
   this.basePos = this.pos;
   this.size = new model.Vector(1, 1);
-  this.speed = new model.Vector(0, 0);
+  this.speed = new model.Vector(0, 3);
   this.wobble = Math.random() * (Math.PI * 2);
 };
 
 model.Tire.prototype.act = function (step) {
   var wobblePos;
-  this.wobble += step * wobbleSpeed;
+  this.wobble += (step * wobbleSpeed) / 2;
   wobblePos = Math.sin(this.wobble) * wobbleDist;
   this.pos = this.basePos.plus(new model.Vector(0, wobblePos));
+  this.speed = new model.Vector(0, 3);
 };
 
 model.Tire.prototype.type = 'tire';
 
 model.Baltagy = function (pos) {
   this.pos = pos;
-  this.size = new model.Vector(2, 2);
-  this.speed = new model.Vector(0, 5);
+  this.size = new model.Vector(1, 1);
+  this.speed = new model.Vector(0, 3);
 };
 
 model.Baltagy.prototype.act = function (step, level) {
@@ -170,6 +147,12 @@ model.Baltagy.prototype.act = function (step, level) {
 };
 
 model.Baltagy.prototype.type = 'baltagy';
+
+model.actorChars = {
+  a: model.Ahmad,
+  x: model.Tire,
+  e: model.Baltagy
+};
 
 model.Level = function (plan) {
   var x;
@@ -190,7 +173,7 @@ model.Level = function (plan) {
     for (x = 0; x < this.width; x += 1) {
       ch = row[x];
       field = null;
-      Actor = actorChars[ch];
+      Actor = model.actorChars[ch];
       if (Actor) {
         this.actors.push(new Actor(new model.Vector(x, y), ch));
       } else if (ch === 'x') {
@@ -315,7 +298,7 @@ view.DOMView.prototype.drawActors = function () {
     rect.style.width = (actor.size.x * scale) + 'px';
     rect.style.height = (actor.size.y * scale) + 'px';
     rect.style.left = (actor.pos.x * scale) + 'px';
-    rect.style.top = (actor.pox.y * scale) + 'px';
+    rect.style.top = (actor.pos.y * scale) + 'px';
   });
   return wrap;
 };

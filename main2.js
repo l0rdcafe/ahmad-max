@@ -1,5 +1,5 @@
 var da2ery = [
-  '      xxxxx           ',
+  ' e    xxxxx           ',
   '                      ',
   '       e           xxx',
   '                      ',
@@ -32,11 +32,6 @@ var da2ery = [
 ];
 
 var model = {};
-model.actorChars = {
-  a: model.Ahmad,
-  x: model.Tire,
-  e: model.Baltagy
-};
 
 model.Level = function (plan) {
   var x;
@@ -117,5 +112,11 @@ model.Tire = function (pos) {
 };
 
 model.Tire.prototype.type = 'tire';
+
+model.actorChars = {
+  a: model.Ahmad,
+  x: model.Tire,
+  e: model.Baltagy
+};
 
 console.log(new model.Level(da2ery));
